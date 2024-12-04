@@ -1,3 +1,6 @@
 .venv/
 gg.ipynb
 data/fraud_test.csv
+src/models/__pycache__/KNearestNeighborsScratch.cpython-312.pyc
+src/models/__pycache__/LogisticRegressionScratch.cpython-312.pyc
+src/models/__pycache__/SVMscratch.cpython-312.pyc
