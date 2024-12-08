@@ -92,8 +92,51 @@ def plot_metrics(metrics, y_test, y_pred, y_prob=None):
 def main():
     st.set_page_config(page_title="Fraud Detection App", layout="wide")
     
+    # Create a container for the sidebar
+    with st.sidebar:
+        st.title("Settings")
+        # Replace checkbox with button
+        if st.button("📖 Project Information", use_container_width=True):
+            st.session_state.show_info = True
+        elif not "show_info" in st.session_state:
+            st.session_state.show_info = False
+    
+    if st.session_state.show_info:
+        st.markdown("""
+        # Credit Card Fraud Detection Project
+
+        📘 For detailed implementation and analysis, check out our [GitHub Jupyter Notebook](https://github.com/yourusername/fraud-detection/blob/main/analysis.ipynb)
+
+        ## Project Overview
+        This project implements custom machine learning algorithms from scratch to detect fraudulent credit card transactions. We focus on three core algorithms: SVM, KNN, and Logistic Regression, each built using fundamental mathematical principles without relying on existing ML libraries.
+
+        ## Key Features
+        - Custom implementation of ML algorithms
+        - Interactive visualization of model performance
+        - Real-time model parameter tuning
+        - Comprehensive performance metrics
+
+        ## Acknowledgments
+        - Dataset provided by Kaggle
+        - Inspired by research from IEEE papers on fraud detection
+        - Special thanks to the scikit-learn documentation for algorithm references
+
+        ## Resources
+        - [Scikit-learn Documentation](https://scikit-learn.org/)
+        - [Research Paper: "Credit Card Fraud Detection Using Machine Learning"](https://example.com)
+        - [Mathematics of Machine Learning](https://example.com)
+        - [Dataset Source](https://kaggle.com)
+        """)
+        
+        # Add a button to go back to the main app
+        if st.button("← Back to App"):
+            st.session_state.show_info = False
+            st.rerun()
+            
+        return  # Exit the function here if showing project info
+
+    # Rest of the application code
     st.title("Credit Card Fraud Detection")
-    st.sidebar.title("Settings")
     st.markdown("Binary Classification using Custom Implementation")
     
     try:
@@ -194,8 +237,21 @@ def main():
         # Model training and evaluation
         if classifier == 'Logistic Regression':
             st.sidebar.subheader("Model Hyperparameters")
-            learning_rate = st.sidebar.number_input("Learning Rate", 0.001, 1.0, step=0.001, value=0.01)
-            epochs = st.sidebar.number_input("Number of Epochs", 100, 100000, step=100, value=1000)
+            learning_rate = st.sidebar.number_input(
+                "Learning Rate",
+                min_value=0.001,
+                max_value=1.0,
+                value=0.01,
+                step=0.001,
+                format="%.3f"
+            )
+            epochs = st.sidebar.number_input(
+                "Number of Epochs",
+                min_value=100,
+                max_value=100000,
+                value=1000,
+                step=100
+            )
 
             if st.sidebar.button("Classify", key="classify_lr"):
                 with st.spinner('Training Logistic Regression...'):
@@ -251,35 +307,31 @@ def main():
         # Show raw data option
         if st.sidebar.checkbox("Show raw data", False):
             st.subheader("Credit Card Fraud Dataset")
-            st.dataframe(pd.concat([X, y], axis=1))
-
-        # Move About section to the bottom of sidebar
-        if st.sidebar.checkbox("Show Project Information", False):
-            st.markdown("""
-            # Credit Card Fraud Detection Project
-
-            📘 For detailed implementation and analysis, check out our [GitHub Jupyter Notebook](https://github.com/yourusername/fraud-detection/blob/main/analysis.ipynb)
-
-            ## Project Overview
-            This project implements custom machine learning algorithms from scratch to detect fraudulent credit card transactions. We focus on three core algorithms: SVM, KNN, and Logistic Regression, each built using fundamental mathematical principles without relying on existing ML libraries.
-
-            ## Key Features
-            - Custom implementation of ML algorithms
-            - Interactive visualization of model performance
-            - Real-time model parameter tuning
-            - Comprehensive performance metrics
-
-            ## Acknowledgments
-            - Dataset provided by Kaggle
-            - Inspired by research from IEEE papers on fraud detection
-            - Special thanks to the scikit-learn documentation for algorithm references
-
-            ## Resources
-            - [Scikit-learn Documentation](https://scikit-learn.org/)
-            - [Research Paper: "Credit Card Fraud Detection Using Machine Learning"](https://example.com)
-            - [Mathematics of Machine Learning](https://example.com)
-            - [Dataset Source](https://kaggle.com)
-            """)
+            if reduction_method == "None":
+                # Show original data
+                st.dataframe(pd.concat([X, y], axis=1))
+            else:
+                # Show reduced data
+                if reduction_method == "SVD":
+                    # For SVD, use generic feature names since original features are transformed
+                    reduced_df = pd.DataFrame(
+                        X_train_scaled,
+                        columns=[f'Component_{i+1}' for i in range(X_train_scaled.shape[1])]
+                    )
+                elif reduction_method == "Correlation Filter":
+                    # For Correlation Filter, keep the original feature names that weren't removed
+                    if isinstance(X_train_scaled, np.ndarray):
+                        # Get the indices of kept features using the keep_mask
+                        kept_features = X_train.columns[reducer.keep_mask]
+                        reduced_df = pd.DataFrame(X_train_scaled, columns=kept_features)
+                    else:
+                        reduced_df = pd.DataFrame(X_train_scaled)
+                
+                # Add target column
+                reduced_df['is_fraud'] = y_train
+                
+                st.write("Data after feature reduction:")
+                st.dataframe(reduced_df)
 
     except Exception as e:
         st.error(f"An error occurred: {e}")
