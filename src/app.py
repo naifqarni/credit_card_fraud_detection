@@ -162,23 +162,29 @@ def main():
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
         
         # Balance only the training data
-        fraud_indices = y_train[y_train == 1].index
-        non_fraud_indices = y_train[y_train == 0].index
+        fraud_mask = y_train == 1
+        non_fraud_mask = y_train == 0
         
-        # Random under-sampling of majority class to match minority class
-        non_fraud_indices_sampled = np.random.choice(
-            non_fraud_indices, 
-            size=len(fraud_indices), 
+        # Get the number of fraud cases
+        n_fraud = fraud_mask.sum()
+        
+        # Get indices of non-fraud cases and sample them
+        non_fraud_indices = np.where(non_fraud_mask)[0]
+        sampled_non_fraud_indices = np.random.choice(
+            non_fraud_indices,
+            size=n_fraud,
             replace=False
         )
         
-        # Combine the indices and sort them
-        balanced_indices = np.concatenate([fraud_indices, non_fraud_indices_sampled])
-        balanced_indices.sort()
+        # Create mask for selected samples
+        selected_indices = np.concatenate([
+            np.where(fraud_mask)[0],
+            sampled_non_fraud_indices
+        ])
         
-        # Create balanced training set
-        X_train = X_train.iloc[balanced_indices]
-        y_train = y_train.iloc[balanced_indices]
+        # Balance the training data
+        X_train = X_train.iloc[selected_indices]
+        y_train = y_train.iloc[selected_indices]
         
         # Scale the features
         scaler = StandardScaler()
