@@ -14,6 +14,7 @@ from models.KNearestNeighborsScratch import KNearestNeighborsScratch
 from feature_reduction.PCAScratch import PCA, find_optimal_components
 from feature_reduction.SVDscratch import SVD
 from feature_reduction.CorrelationFilter import CorrelationFilter
+from sklearn.preprocessing import LabelEncoder
 
 def load_data():
     try:
@@ -22,13 +23,18 @@ def load_data():
         data = data.loc[:, ~data.columns.str.contains('^Unnamed')]
         
         # Preprocessing
+# Preprocessing: Convert date/time columns to numerical format or drop them
         for column in data.columns:
-            # Convert datetime columns to numeric
+            # Check if column is datetime-like
             if pd.api.types.is_datetime64_any_dtype(data[column]):
-                data[column] = pd.to_numeric(pd.to_datetime(data[column]))
-            # Encode categorical columns
+                data[column] = data[column].astype(int)  # Convert datetime to numerical (timestamp)
             elif pd.api.types.is_object_dtype(data[column]):
-                data[column] = pd.factorize(data[column])[0]
+                # Encode categorical text columns
+                encoder = LabelEncoder()
+                data[column] = encoder.fit_transform(data[column])
+
+        # Check for missing values and handle them
+        data = data.fillna(0)
         
         # Split features and target
         X = data.drop('is_fraud', axis=1)
