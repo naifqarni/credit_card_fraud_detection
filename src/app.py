@@ -105,27 +105,47 @@ def main():
         st.markdown("""
         # Credit Card Fraud Detection Project
 
-        📘 For detailed implementation and analysis, check out our [GitHub Jupyter Notebook](https://github.com/yourusername/fraud-detection/blob/main/analysis.ipynb)
+        ## Course Information
+        This project was developed for MATH-557 Applied Linear Algebra under the supervision of Dr. Mohammed Alshrani.
+
+        📘 For a detailed walkthrough of the implementation and mathematical concepts, check out our [Project Notebook](https://github.com/naifqarni/credit_card_fraud_detection/blob/main/project_notbook.ipynb)
 
         ## Project Overview
-        This project implements custom machine learning algorithms from scratch to detect fraudulent credit card transactions. We focus on three core algorithms: SVM, KNN, and Logistic Regression, each built using fundamental mathematical principles without relying on existing ML libraries.
+        This project implements custom machine learning algorithms from scratch to detect fraudulent credit card transactions. The implementation focuses on two core algorithms: Logistic Regression and K-Nearest Neighbors (KNN), built using fundamental mathematical principles and linear algebra concepts.
 
         ## Key Features
-        - Custom implementation of ML algorithms
-        - Interactive visualization of model performance
-        - Real-time model parameter tuning
-        - Comprehensive performance metrics
+        - Custom implementation of machine learning algorithms:
+          - Logistic Regression with gradient descent
+          - K-Nearest Neighbors (KNN)
+        - Feature reduction techniques:
+          - Singular Value Decomposition (SVD)
+          - Correlation-based Feature Selection
+        - Interactive visualization of model performance:
+          - Confusion Matrix
+          - ROC Curve
+          - Precision-Recall Curve
+        - Real-time parameter tuning:
+          - Learning rate and epochs for Logistic Regression
+          - Number of neighbors for KNN
+          - Correlation threshold for feature selection
+          - Number of components for SVD
+
+        ## Implementation Details
+        - All algorithms are implemented from scratch using NumPy
+        - Feature reduction methods for dimensionality reduction
+        - Interactive web interface using Streamlit
+        - Comprehensive performance metrics and visualizations
 
         ## Acknowledgments
+        - Dr. Mohammed Alshrani for course guidance and project supervision
         - Dataset provided by Kaggle
-        - Inspired by research from IEEE papers on fraud detection
-        - Special thanks to the scikit-learn documentation for algorithm references
+        - NumPy and Streamlit documentation
 
         ## Resources
-        - [Scikit-learn Documentation](https://scikit-learn.org/)
-        - [Research Paper: "Credit Card Fraud Detection Using Machine Learning"](https://example.com)
-        - [Mathematics of Machine Learning](https://example.com)
-        - [Dataset Source](https://kaggle.com)
+        - [Course Materials MATH-557]
+        - [NumPy Documentation](https://numpy.org/doc/)
+        - [Streamlit Documentation](https://docs.streamlit.io)
+        - [Dataset Source](https://www.kaggle.com/datasets/kelvinkelue/credit-card-fraud-prediction/code)
         """)
         
         # Add a button to go back to the main app
