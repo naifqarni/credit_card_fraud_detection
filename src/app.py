@@ -7,6 +7,7 @@ from sklearn.metrics import precision_score, recall_score, confusion_matrix, roc
 from sklearn.decomposition import TruncatedSVD
 import matplotlib.pyplot as plt
 import seaborn as sns
+import xgboost as xgb
 
 # Import custom models
 from models.LogisticRegressionScratch import LogisticRegressionScratch
@@ -37,17 +38,6 @@ def load_data():
         # Split features and target
         X = data.drop('is_fraud', axis=1)
         y = data['is_fraud']
-        
-        # Balance the dataset using random under-sampling
-        fraud_samples = data[data['is_fraud'] == 1]
-        non_fraud_samples = data[data['is_fraud'] == 0].sample(n=len(fraud_samples), random_state=42)
-        
-        # Combine the balanced samples
-        balanced_data = pd.concat([fraud_samples, non_fraud_samples])
-        
-        # Split features and target from balanced data
-        X = balanced_data.drop('is_fraud', axis=1)
-        y = balanced_data['is_fraud']
         
         return X, y
     except Exception as e:
@@ -117,6 +107,8 @@ def main():
         - Custom implementation of machine learning algorithms:
           - Logistic Regression with gradient descent
           - K-Nearest Neighbors (KNN)
+        - Advanced ML implementation:
+          - XGBoost for high performance
         - Feature reduction techniques:
           - Singular Value Decomposition (SVD)
           - Correlation-based Feature Selection
@@ -166,8 +158,27 @@ def main():
             st.error("Failed to load data")
             return
 
-        # Split the data
+        # First split the data
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+        
+        # Balance only the training data
+        fraud_indices = y_train[y_train == 1].index
+        non_fraud_indices = y_train[y_train == 0].index
+        
+        # Random under-sampling of majority class to match minority class
+        non_fraud_indices_sampled = np.random.choice(
+            non_fraud_indices, 
+            size=len(fraud_indices), 
+            replace=False
+        )
+        
+        # Combine the indices and sort them
+        balanced_indices = np.concatenate([fraud_indices, non_fraud_indices_sampled])
+        balanced_indices.sort()
+        
+        # Create balanced training set
+        X_train = X_train.iloc[balanced_indices]
+        y_train = y_train.iloc[balanced_indices]
         
         # Scale the features
         scaler = StandardScaler()
@@ -242,7 +253,8 @@ def main():
         classifier = st.sidebar.selectbox(
             "Classifier", 
             ("Logistic Regression",
-             "K-Nearest Neighbors (KNN)")
+             "K-Nearest Neighbors (KNN)",
+             "XGBoost")
         )
 
         metrics = st.sidebar.multiselect(
@@ -297,7 +309,7 @@ def main():
                     
                     plot_metrics(metrics, y_test, y_pred, y_prob)
 
-        else:  # KNN
+        elif classifier == 'K-Nearest Neighbors (KNN)':
             st.sidebar.subheader("Model Hyperparameters")
             k = st.sidebar.number_input("Number of neighbors (K)", 1, 10, step=2, value=3)
 
@@ -323,6 +335,60 @@ def main():
                         st.info(f"Feature reduction: {(1 - X_train_scaled.shape[1]/X.shape[1])*100:.1f}% reduction")
                     
                     plot_metrics(metrics, y_test, y_pred)
+
+        elif classifier == 'XGBoost':
+            st.sidebar.subheader("Model Hyperparameters")
+            learning_rate = st.sidebar.number_input(
+                "Learning Rate",
+                min_value=0.01,
+                max_value=0.3,
+                value=0.1,
+                step=0.01,
+                format="%.2f"
+            )
+            max_depth = st.sidebar.number_input(
+                "Max Depth",
+                min_value=3,
+                max_value=10,
+                value=6,
+                step=1
+            )
+            n_estimators = st.sidebar.number_input(
+                "Number of Trees",
+                min_value=50,
+                max_value=1000,
+                value=100,
+                step=50
+            )
+
+            if st.sidebar.button("Classify", key="classify_xgb"):
+                with st.spinner('Training XGBoost...'):
+                    model = xgb.XGBClassifier(
+                        learning_rate=learning_rate,
+                        max_depth=max_depth,
+                        n_estimators=n_estimators,
+                        random_state=42
+                    )
+                    model.fit(X_train_scaled, y_train)
+                    y_pred = model.predict(X_test_scaled)
+                    y_prob = model.predict_proba(X_test_scaled)[:, 1]
+                    
+                    col1, col2, col3 = st.columns(3)
+                    accuracy = np.mean(y_pred == y_test)
+                    with col1:
+                        st.metric("Accuracy", f"{accuracy:.2f}")
+                    with col2:
+                        st.metric("Precision", f"{precision_score(y_test, y_pred):.2f}")
+                    with col3:
+                        st.metric("Recall", f"{recall_score(y_test, y_pred):.2f}")
+                    
+                    # Add feature reduction information
+                    st.info(f"Original number of features: {X.shape[1]}")
+                    if reduction_method != "None":
+                        st.info(f"Number of features after {reduction_method}: {X_train_scaled.shape[1]}")
+                        st.info(f"Feature reduction: {(1 - X_train_scaled.shape[1]/X.shape[1])*100:.1f}% reduction")
+                    
+                    plot_metrics(metrics, y_test, y_pred, y_prob)
 
         # Show raw data option
         if st.sidebar.checkbox("Show raw data", False):
