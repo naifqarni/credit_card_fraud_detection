@@ -1,15 +1,15 @@
 # Credit Card Fraud Detection
 
-
 ## Project Overview
 
-This project aims to detect fraudulent transactions within credit card datasets using Jupyter Notebook as part of the Math 557 course requirements. It applies linear algebra techniques to demonstrate how they can enhance machine learning and classification in fraud detection.
+This project aims to detect fraudulent transactions within credit card datasets using both an interactive Streamlit application and Jupyter Notebook as part of the Math 557 course requirements. It applies linear algebra techniques to demonstrate how they can enhance machine learning and classification in fraud detection.
 
 ## Table of Contents
 
 - [Project Overview](#project-overview)
 - [Dataset](#dataset)
-- [Approach](#approach)
+- [Features](#features)
+- [Installation](#installation)
 - [Usage](#usage)
 - [Acknowledgments](#acknowledgments)
 
@@ -17,33 +17,77 @@ This project aims to detect fraudulent transactions within credit card datasets 
 
 The dataset contains anonymized credit card transactions labeled as fraudulent or legitimate. Various features were transformed and selected to build an effective fraud detection model. These features are essential for identifying patterns in the data that may signify fraud.
 
-## Approach
+## Features
 
-This project uses linear algebra techniques within Jupyter Notebook to facilitate analysis, including:
+- Interactive web interface for real-time fraud detection
+- Custom implementation of machine learning algorithms:
+  - Logistic Regression with gradient descent
+  - K-Nearest Neighbors (KNN)
+  - XGBoost for high performance
+- Feature reduction techniques:
+  - Singular Value Decomposition (SVD)
+  - Correlation-based Feature Selection
+- Comprehensive visualization of model performance
+- Real-time parameter tuning
 
-- **Data Preprocessing**: Standardizing and normalizing features to improve model performance.
-- **Dimensionality Reduction**: Principal Component Analysis (PCA) was applied to reduce the dataset's dimensionality, making the data more manageable and helping the model focus on the most critical aspects.
-- **Modeling**: A classification model was developed, trained, and evaluated within the notebook to identify fraudulent transactions with accuracy. The model’s results include accuracy, precision, and recall metrics to gauge the effectiveness of the fraud detection model.
+## Installation
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/yourusername/credit-card-fraud-detection.git
+   cd credit-card-fraud-detection
+   ```
+
+2. Create a virtual environment (optional but recommended):
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # On Windows use: venv\Scripts\activate
+   ```
+
+3. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
 
 ## Usage
 
-1. **Install Dependencies**  
-   Ensure you have Python, Jupyter Notebook, and the required packages installed. To install the necessary dependencies, run:
+### Running the Interactive Web Application
+
+1. Navigate to the src directory:
    ```bash
-   pip install -r requirements.txt
+   cd src
+   ```
 
-2. **Open the Notebook**  
-   Start Jupyter Notebook and open fraud_detection.ipynb:
+2. Launch the Streamlit app:
    ```bash
-   jupyter notebook fraud_detection.ipynb
+   streamlit run app.py
+   ```
 
-Run the Cells
-Execute each cell in the notebook to preprocess the data, train the model, and evaluate its performance. Results, including accuracy, precision, and recall metrics, will be displayed within the notebook.
+3. Open your web browser and go to the URL shown in the terminal (typically http://localhost:8501)
 
+### Using the Jupyter Notebook
+
+1. Start Jupyter Notebook:
+   ```bash
+   jupyter notebook
+   ```
+
+2. Open `project_notebook.ipynb` in your browser
+
+3. Execute the cells to:
+   - Explore the data analysis
+   - View the mathematical concepts
+   - See detailed implementation of algorithms
+   - Examine model performance metrics
 
 ## Acknowledgments
 
-This project was developed as part of the Math 557 Linear Algebra course. 
-Special thanks to the course instructor for his guidance and to the providers of the dataset for enabling this exploration of linear algebra in machine learning and fraud detection.
+This project was developed as part of the Math 557 Applied Linear Algebra course under the supervision of Dr. Mohammed Alshrani. 
+
+Special thanks to:
+- Dr. Mohammed Alshrani for course guidance and project supervision
+- The providers of the dataset for enabling this exploration
+- NumPy and Streamlit documentation for implementation references
+
 
 
