@@ -94,7 +94,7 @@ def main():
     
     st.title("Credit Card Fraud Detection")
     st.sidebar.title("Settings")
-    st.markdown("Binary Classification using Custom Implementation 🎯")
+    st.markdown("Binary Classification using Custom Implementation")
     
     try:
         # Load and preprocess data
@@ -144,17 +144,31 @@ def main():
                     st.info(f"Total explained variance ratio: {cumulative_var_ratio[-1]:.2%}")
                 
                 elif reduction_method == "Correlation Filter":
-                    reducer = CorrelationFilter(threshold=0.8)
-                    X_train_reduced = reducer.fit_transform(X_train_scaled)
+                    # Add threshold selection slider
+                    correlation_threshold = st.sidebar.slider(
+                        "Correlation Threshold",
+                        min_value=0.1,
+                        max_value=1.0,
+                        value=0.8,
+                        step=0.1,
+                        help="Features with correlation above this threshold will be removed"
+                    )
+                    
+                    # Convert DataFrame to numpy array for CorrelationFilter
+                    X_train_array = X_train_scaled
+                    if isinstance(X_train_scaled, pd.DataFrame):
+                        X_train_array = X_train_scaled.values
+                    
+                    reducer = CorrelationFilter(threshold=correlation_threshold)
+                    X_train_reduced = reducer.fit_transform(X_train_array)
                     X_test_reduced = reducer.transform(X_test_scaled)
                     
-                    # Display removed features
-                    removed_features = list(set(X_train.columns) - set(reducer.selected_features_))
-                    st.info(f"Reduced features from {X_train_scaled.shape[1]} to {X_train_reduced.shape[1]} features")
-                    if removed_features:
-                        st.write("Removed features due to high correlation:")
-                        for feat in removed_features:
-                            st.write(f"- {feat}")
+                    # Calculate number of features removed
+                    original_features = X_train_array.shape[1]
+                    reduced_features = X_train_reduced.shape[1]
+                    
+                    st.info(f"Reduced features from {original_features} to {reduced_features} features")
+                    st.info(f"Removed {original_features - reduced_features} features due to high correlation")
                 
                 # Update the training and test data
                 X_train_scaled = X_train_reduced
