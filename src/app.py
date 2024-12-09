@@ -44,41 +44,6 @@ def load_data():
         st.error(f"Error loading data: {e}")
         return None, None
 
-def plot_metrics(metrics, y_test, y_pred, y_prob=None):
-    if 'Confusion Matrix' in metrics:
-        st.subheader("Confusion Matrix")
-        cm = confusion_matrix(y_test, y_pred)
-        fig, ax = plt.subplots(figsize=(8, 6))
-        sns.heatmap(cm, annot=True, fmt='d', ax=ax, cmap='Blues')
-        ax.set_xlabel('Predicted labels')
-        ax.set_ylabel('True labels')
-        st.pyplot(fig)
-        plt.close()
-
-    if y_prob is not None:
-        if 'ROC Curve' in metrics:
-            st.subheader("ROC Curve")
-            fpr, tpr, _ = roc_curve(y_test, y_prob)
-            auc_score = auc(fpr, tpr)
-            fig, ax = plt.subplots(figsize=(8, 6))
-            ax.plot(fpr, tpr, label=f'ROC curve (AUC = {auc_score:.2f})')
-            ax.plot([0, 1], [0, 1], 'k--')
-            ax.set_xlabel('False Positive Rate')
-            ax.set_ylabel('True Positive Rate')
-            ax.legend(loc='lower right')
-            st.pyplot(fig)
-            plt.close()
-
-        if 'Precision-Recall Curve' in metrics:
-            st.subheader("Precision-Recall Curve")
-            precision, recall, _ = precision_recall_curve(y_test, y_prob)
-            fig, ax = plt.subplots(figsize=(8, 6))
-            ax.plot(recall, precision)
-            ax.set_xlabel('Recall')
-            ax.set_ylabel('Precision')
-            st.pyplot(fig)
-            plt.close()
-
 def main():
     st.set_page_config(page_title="Fraud Detection App", layout="wide")
     
@@ -112,10 +77,6 @@ def main():
         - Feature reduction techniques:
           - Singular Value Decomposition (SVD)
           - Correlation-based Feature Selection
-        - Interactive visualization of model performance:
-          - Confusion Matrix
-          - ROC Curve
-          - Precision-Recall Curve
         - Real-time parameter tuning:
           - Learning rate and epochs for Logistic Regression
           - Number of neighbors for KNN
@@ -263,11 +224,6 @@ def main():
              "XGBoost")
         )
 
-        metrics = st.sidebar.multiselect(
-            "What metrics to plot?",
-            ('Confusion Matrix', 'ROC Curve', 'Precision-Recall Curve')
-        )
-
         # Model hyperparameters sections remain here...
 
        
@@ -302,10 +258,6 @@ def main():
                     accuracy = np.mean(y_pred == y_test)
                     with col1:
                         st.metric("Accuracy", f"{accuracy:.2f}")
-                    with col2:
-                        st.metric("Precision", f"{precision_score(y_test, y_pred):.2f}")
-                    with col3:
-                        st.metric("Recall", f"{recall_score(y_test, y_pred):.2f}")
                     
                     # Add feature reduction information
                     st.info(f"Original number of features: {X.shape[1]}")
@@ -313,7 +265,6 @@ def main():
                         st.info(f"Number of features after {reduction_method}: {X_train_scaled.shape[1]}")
                         st.info(f"Feature reduction: {(1 - X_train_scaled.shape[1]/X.shape[1])*100:.1f}% reduction")
                     
-                    plot_metrics(metrics, y_test, y_pred, y_prob)
 
         elif classifier == 'K-Nearest Neighbors (KNN)':
             st.sidebar.subheader("Model Hyperparameters")
@@ -329,10 +280,6 @@ def main():
                     accuracy = np.mean(y_pred == y_test)
                     with col1:
                         st.metric("Accuracy", f"{accuracy:.2f}")
-                    with col2:
-                        st.metric("Precision", f"{precision_score(y_test, y_pred):.2f}")
-                    with col3:
-                        st.metric("Recall", f"{recall_score(y_test, y_pred):.2f}")
                     
                     # Add feature reduction information
                     st.info(f"Original number of features: {X.shape[1]}")
@@ -340,7 +287,6 @@ def main():
                         st.info(f"Number of features after {reduction_method}: {X_train_scaled.shape[1]}")
                         st.info(f"Feature reduction: {(1 - X_train_scaled.shape[1]/X.shape[1])*100:.1f}% reduction")
                     
-                    plot_metrics(metrics, y_test, y_pred)
 
         elif classifier == 'XGBoost':
             st.sidebar.subheader("Model Hyperparameters")
@@ -383,10 +329,6 @@ def main():
                     accuracy = np.mean(y_pred == y_test)
                     with col1:
                         st.metric("Accuracy", f"{accuracy:.2f}")
-                    with col2:
-                        st.metric("Precision", f"{precision_score(y_test, y_pred):.2f}")
-                    with col3:
-                        st.metric("Recall", f"{recall_score(y_test, y_pred):.2f}")
                     
                     # Add feature reduction information
                     st.info(f"Original number of features: {X.shape[1]}")
@@ -394,7 +336,6 @@ def main():
                         st.info(f"Number of features after {reduction_method}: {X_train_scaled.shape[1]}")
                         st.info(f"Feature reduction: {(1 - X_train_scaled.shape[1]/X.shape[1])*100:.1f}% reduction")
                     
-                    plot_metrics(metrics, y_test, y_pred, y_prob)
 
         # Show raw data option
         if st.sidebar.checkbox("Show raw data", False):
